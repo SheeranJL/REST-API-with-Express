@@ -24,13 +24,12 @@ router.post('/users', asyncHandler(async (req, res) => {
     console.log('Error', error.name)
     if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
       const errors = error.errors.map(err => err.message);
-      res.status(400).json({ errors })
+      res.status(400).location('/').json({ errors })
     } else {
       throw error;
     }
 }
 }));
-
 
 
 //**Return all courses including the User associated with each course**//
@@ -45,6 +44,7 @@ router.get('/courses', asyncHandler(async (req, res) => {
 }));
 
 
+
 //**Return a corresponding course with id param including associated users**//
 router.get('/courses/:id', asyncHandler(async (req, res) => {
   const course = await Course.findByPk(req.params.id, { //<--- finding course by requested ID params in URL and including any associated users in the JSON output.
@@ -55,6 +55,7 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
   });
   (course) ? res.status(200).json({course}) : res.status(401).json({message:'Course not found'})
 }));
+
 
 
 //**Creates a new course**
@@ -74,17 +75,42 @@ router.post('/courses', asyncHandler(async (req, res) => {
 }));
 
 
-//**Edits a corresponding course**//
+//**Edits an existing course**//
 router.put('/courses/:id', asyncHandler(async (req, res) => {
-  //code goes here
+  const course = await Course.findByPk(req.params.id);   //<--- Obtaining the course via id url param
+  if (course) {                                          //<--- Does the course exist?
+
+    Course.update(                                       //<--- Updating course item
+      { title: req.body.title,                           //<--- With these key/values
+        description: req.body.description,               //<--- ...
+        estimatedTime: req.body.estimatedTime,           //<--- ...
+        materialsNeeded: req.body.materialsNeeded        //<--- ...
+      }, {
+        where: {id: req.params.id}                       //<--- And declaring which specific course to update
+      }
+    )
+    await course.save();                                 //<--- Saving the modidications back to database
+    res.status(204).end();                               //<--- Sending 204 status and ending block
+  } else {
+    res.status(404).json({message: 'Course not found - cannot update'})
+  }
 }));
 
 
-//**Deleted a corresponding course**//
+//**Deletes an existing course**//
 router.delete('/courses/:id', asyncHandler(async (req, res) => {
-  //code goes here
+  const course = await Course.findOne({
+    id: req.params.id
+  });
+  if (course) {
+    Course.destroy({
+      where: {id:req.params.id}
+    })
+    res.status(204).end();
+  } else {
+    res.status(404).json({message: 'Course not found - cannot delete'})
+  }
 }))
-
 
 
 

@@ -17,6 +17,9 @@ module.exports = (sequelize) => {
       validate: {
         notNull: {
           msg: 'Please enter a title'
+        },
+        notEmpty: {
+          msg: 'please provide a title'
         }
       }
     },
@@ -27,6 +30,9 @@ module.exports = (sequelize) => {
       validate: {
         notNull: {
           msg: 'Please enter a description'
+        },
+        notEmpty: {
+          msg: 'Please provide a description'
         }
       }
     },
@@ -37,6 +43,9 @@ module.exports = (sequelize) => {
       validate: {
         notNull: {
           msg: 'Please enter a time'
+        },
+        notEmpty: {
+          msg: 'Please provide an estimated time'
         }
       }
     },
@@ -47,6 +56,9 @@ module.exports = (sequelize) => {
       validate: {
         notNull: {
           msg: 'Please enter materials required'
+        },
+        notEmpty: {
+          msg: 'Please provide materials'
         }
       }
     },
