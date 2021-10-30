@@ -35,14 +35,25 @@ router.post('/users', asyncHandler(async (req, res) => {
 
 //**Return all courses including the User associated with each course**//
 router.get('/courses', asyncHandler(async (req, res) => {
-  const courses = await Course.findAll();
+  const courses = await Course.findAll({
+    include: [{ //<--- Making sure to include all associated users enrolled in the course.
+      model: User,
+      as: 'Enrolled',
+    }]
+  });
   res.status(200).json(courses);
 }));
 
 
-//**Return a corresponding course with id param incouding user corresponding w/ course**//
+//**Return a corresponding course with id param including associated users**//
 router.get('/courses/:id', asyncHandler(async (req, res) => {
-  //code goes here
+  const course = await Course.findByPk(req.params.id, { //<--- finding course by requested ID params in URL and including any associated users in the JSON output.
+    include: [{
+      model: User,
+      as: 'Enrolled',
+    }]
+  });
+  (course) ? res.status(200).json({course}) : res.status(401).json({message:'Course not found'})
 }));
 
 
