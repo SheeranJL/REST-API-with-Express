@@ -1,5 +1,8 @@
 'use strict';
 
+const {sequelize, models} = require('./models');
+const routes = require('./routes')
+
 // load modules
 const express = require('express');
 const morgan = require('morgan');
@@ -10,6 +13,9 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 // create the Express app
 const app = express();
 
+// Setup request body to parse JSON // <--- otherwise req.body returns undefined.
+app.use(express.json());
+
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
 
@@ -19,6 +25,13 @@ app.get('/', (req, res) => {
     message: 'Welcome to the REST API project!',
   });
 });
+
+
+//Getting routes and adding /api ///
+app.use('/api', routes);
+
+
+
 
 // send 404 if no other route matched
 app.use((req, res) => {
@@ -32,7 +45,6 @@ app.use((err, req, res, next) => {
   if (enableGlobalErrorLogging) {
     console.error(`Global error handler: ${JSON.stringify(err.stack)}`);
   }
-
   res.status(err.status || 500).json({
     message: err.message,
     error: {},
@@ -42,7 +54,24 @@ app.use((err, req, res, next) => {
 // set our port
 app.set('port', process.env.PORT || 5000);
 
+
+
+//Testing the database connection//
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Connection to DB established...')
+  } catch(err) {
+    console.log('Connection to DB failed...', err);
+  }
+})();
+
+
+
 // start listening on our port
-const server = app.listen(app.get('port'), () => {
-  console.log(`Express server is listening on port ${server.address().port}`);
-});
+sequelize.sync()
+  .then( () => {
+    const server = app.listen(app.get('port'), () => {
+      console.log(`Express server is listening on port ${server.address().port}`);
+    });
+  });
