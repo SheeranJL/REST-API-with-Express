@@ -113,11 +113,26 @@ router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) =>
   });
   if (course) {                                                       //<-- If the course exists, then destroy the entry where the id of the course is equal to the id of params in body
     Course.destroy({
-      where: {id:req.params.id}
+      where: {id : req.params.id}
     })
     res.status(204).end();                                            //<-- Once deleted, return a 204 successful status and terminate.
   } else {
     res.status(404).json({message: 'Course not found - cannot delete'})
+  }
+}))
+
+
+router.delete('/users/:id', authenticateUser, asyncHandler(async (req, res) => {
+  const user = User.findByPk(req.params.id);
+  if (user) {
+    User.destroy({
+      where: {
+        id : req.params.id
+      }
+    })
+    res.status(201).end();
+  } else {
+    res.status(404).json({message : 'Cannot find user'})
   }
 }))
 

@@ -1,22 +1,22 @@
 'use strict'
-const { Model, DataTypes } = require('sequelize');
-const bcrypt = require('bcrypt'); //<--- for password encryption
+const { Model, DataTypes } = require('sequelize');  //<-- importing Model and DataTypes modules
+const bcrypt = require('bcrypt');                   //<-- for password encryption
 
-
+//**Creating database table for User**//
 module.exports = (sequelize) => {
   class User extends Model {}
-  User.init({
+  User.init({                              //<-- initialising database table for User
 
-    id: {
+    id: {                                  //<-- id field set to integer, is the primary key, and auto-generates
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },
 
-    firstName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
+    firstName: {                            //<-- firstName column
+      type: DataTypes.STRING,               //
+      allowNull: false,                     //
+      validate: {                           //<-- Setting validation with custom messages for when posted the data isn't valid
         notNull: {
           msg: 'Please enter a first name'
         },
@@ -26,10 +26,10 @@ module.exports = (sequelize) => {
       }
     },
 
-    lastName: {
+    lastName: {                              //<-- lastName column
       type: DataTypes.STRING,
       allowNull: false,
-      validate: {
+      validate: {                            //<-- Setting validation with custom messages for when posted the data isn't valid
         notNull: {
           msg: 'Please enter a last name'
         },
@@ -39,10 +39,10 @@ module.exports = (sequelize) => {
       }
     },
 
-    emailAddress: {
+    emailAddress: {                           //<-- emailAddress column
       type: DataTypes.STRING,
       allowNull: false,
-      validate: {
+      validate: {                             //<-- Setting validation with custom messages for when posted the data isn't valid
         notNull: {
           msg: 'Please enter an email address',
         },
@@ -53,10 +53,10 @@ module.exports = (sequelize) => {
       }
     },
 
-    password: {
+    password: {                               //<-- password column
       type: DataTypes.STRING,
       allowNull: false,
-      validate: {
+      validate: {                             //<-- Setting validation with custom messages for when posted the data isn't valid
         notNull: {
           msg: 'A password is required'
         },
@@ -65,13 +65,14 @@ module.exports = (sequelize) => {
         },
         len: {
           args: [8, 20],
-          msg: 'The password should be between 8 and 20 characters in length'
+          msg: 'The password must be between 8 and 20 characters in length'
         },
+
+        //The code below uses a setter to set the value of the password entry to a hashed value, rather than plain text.
         set(val) {
-          if ( val === this.password ) {
-            const hashedPassword = bcrypt.hashSync(val, 10);
-            console.log(hashedPassword);
-            this.setDataValue('password', hashedPassword);
+          if ( val === this.password ) {                      //<-- if val (value being set for password) is equal to the user password..
+            const hashedPassword = bcrypt.hashSync(val, 10);  //<-- then declare a variable which will hold the hashed password value after being hashed.
+            this.setDataValue('password', hashedPassword);    //<-- then update the underlying data value (the password), to it's hashed value instead. This prevents the plain text from being stored.
           }
         },
       }
