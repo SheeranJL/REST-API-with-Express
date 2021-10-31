@@ -39,30 +39,11 @@ module.exports = (sequelize) => {
 
     estimatedTime: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Please enter a time'
-        },
-        notEmpty: {
-          msg: 'Please provide an estimated time'
-        }
-      }
     },
 
     materialsNeeded: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Please enter materials required'
-        },
-        notEmpty: {
-          msg: 'Please provide materials'
-        }
-      }
     },
-
   }, {sequelize});
 
   Course.associate = (models) => {
