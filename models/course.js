@@ -52,7 +52,7 @@ module.exports = (sequelize) => {
     Course.belongsTo(models.User, {
       as: 'Enrolled',
       foreignKey: {
-        fieldName: 'UserId', //<--- setting custom field name
+        fieldName: 'userId', //<--- setting custom field name
         allowNull: false,
       }
     });

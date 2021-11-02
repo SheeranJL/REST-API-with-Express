@@ -71,8 +71,8 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
 //**Creates a new course (user must be authenticated to create new course)**
 router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
   try {
-    await Course.create(req.body);                                //<-- Create a new course with the info provided in the request body
-    res.status(201).location(`/courses/${req.body.id}`).end();    //<-- Once created, send a 201 success response and direct URL to the new course
+    const course = await Course.create(req.body);                                //<-- Create a new course with the info provided in the request body
+    res.status(201).location(`/courses/${course.id}`).end();    //<-- Once created, send a 201 success response and direct URL to the new course
   } catch(error) {
     if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {       //<-- Catch any of these specific errors and display as JSON.
       const errors = error.errors.map(err => err.message);
@@ -108,14 +108,14 @@ router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
 
 //**Deletes an existing course (User must be authenticated to delete)**//
 router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
-  const course = await Course.findOne({                               //<-- Finding course with the id equal to the params provided in the body for id
+  const course = await Course.findOne({                              //<-- Finding course with the id equal to the params provided in the body for id
     id: req.params.id
   });
-  if (course) {                                                       //<-- If the course exists, then destroy the entry where the id of the course is equal to the id of params in body
+  if (course) {                                                      //<-- If the course exists, then destroy the entry where the id of the course is equal to the id of params in body
     Course.destroy({
       where: {id : req.params.id}
     })
-    res.status(204).end();                                            //<-- Once deleted, return a 204 successful status and terminate.
+    res.status(204).end();                                           //<-- Once deleted, return a 204 successful status and terminate.
   } else {
     res.status(404).json({message: 'Course not found - cannot delete'})
   }

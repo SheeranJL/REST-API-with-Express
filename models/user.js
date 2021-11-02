@@ -83,7 +83,7 @@ module.exports = (sequelize) => {
     User.hasMany(models.Course, { //<-- User can be associated with one or more Courses.
       as: 'Enrolled',
       foreignKey: {
-        fieldName: 'UserId',      //<--- setting custom field name
+        fieldName: 'userId',      //<--- setting custom field name
         allowNull: false,
       }
     });

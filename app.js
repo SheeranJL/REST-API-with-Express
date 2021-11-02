@@ -13,11 +13,14 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 // create the Express app
 const app = express();
 
+
 // Setup request body to parse JSON // <--- otherwise req.body returns undefined.
 app.use(express.json());
 
+
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
+
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
