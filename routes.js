@@ -77,8 +77,12 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
 //**Creates a new course (user must be authenticated to create new course)**
 router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
   try {
-    const course = await Course.create(req.body);                                //<-- Create a new course with the info provided in the request body
-    res.status(201).location(`/api/courses/${course.id}`).end();                 //<-- Once created, send a 201 success response and direct URL to the new course
+    const course = await Course.create({
+      title: req.body.title,
+      description: req.body.description,
+      userId: req.currentUser.id
+    });
+    res.status(201).location(`/courses/${course.id}`).end();                 //<-- Once created, send a 201 success response and direct URL to the new course
   } catch(error) {
     if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {       //<-- Catch any of these specific errors and display as JSON.
       const errors = error.errors.map(err => err.message);
@@ -90,27 +94,38 @@ router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
 }));
 
 
-//**Edits an existing course (User must authenticate to make the PUT request)**//
+// **Edits an existing course (User must authenticate to make the PUT request)**//
 router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
   const course = await Course.findByPk(req.params.id);               //<--- Obtaining the course via id url param
-  if (course) {                                                      //<--- Does the course exist?
 
-    Course.update(                                                   //<--- Updating course item
-      { title: req.body.title,                                       //<--- With the data provided in req.body
-        description: req.body.description,                           //<--- ...
-        estimatedTime: req.body.estimatedTime,                       //<--- ...
-        materialsNeeded: req.body.materialsNeeded                    //<--- ...
-      }, {
-        where: {id: req.params.id}                                   //<--- And declaring which specific course to update
-      }
-    )
-    await course.save();                                             //<--- Saving the modidications back to database
-    res.status(204).end();                                           //<--- Sending 204 status and terminating
+  if (course) {
+    if (req.body.description && req.body.title) {
+                console.log('test')
+                try {
+                  Course.update(                                                   //<--- Updating course item
+                    { title: req.body.title,                                       //<--- With the data provided in req.body
+                      description: req.body.description,                           //<--- ...
+                      estimatedTime: req.body.estimatedTime,                       //<--- ...
+                      materialsNeeded: req.body.materialsNeeded                    //<--- ...
+                    }, { where: {id: req.params.id} }
+                  )
+                  await course.save();                                             //<--- Saving the modidications back to database
+                  res.status(204).end();
+                } catch (error) {
+                  if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+                    const errors = error.errors.map(err => err.message)
+                    res.status(400).json({errors})
+                  } else {
+                    throw error;
+                  }
+                }
+    } else {
+      res.status(400).json({message: "please enter a title and a description"})
+    }
   } else {
     res.status(404).json({message: 'Course not found - cannot update'})
   }
 }));
-
 
 //**Deletes an existing course (User must be authenticated to delete)**//
 router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
