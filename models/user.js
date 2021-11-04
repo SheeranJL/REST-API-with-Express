@@ -84,7 +84,7 @@ module.exports = (sequelize) => {
       as: 'Enrolled',
       foreignKey: {
         fieldName: 'userId',      //<--- setting custom field name
-        allowNull: false,
+        allowNull: false
       }
     });
   };

@@ -63,7 +63,13 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
       as: 'Enrolled',
     }]
   });
-  (course) ? res.status(200).json({course}) : res.status(401).json({message:'Course not found'})
+
+  if (course) {
+    res.status(200).json({course})
+  } else {
+    res.status(401).json({message:'Course not found'})
+  }
+
 }));
 
 
@@ -72,11 +78,11 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
 router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
   try {
     const course = await Course.create(req.body);                                //<-- Create a new course with the info provided in the request body
-    res.status(201).location(`/courses/${course.id}`).end();    //<-- Once created, send a 201 success response and direct URL to the new course
+    res.status(201).location(`/api/courses/${course.id}`).end();                 //<-- Once created, send a 201 success response and direct URL to the new course
   } catch(error) {
     if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {       //<-- Catch any of these specific errors and display as JSON.
       const errors = error.errors.map(err => err.message);
-      res.status(400).json({errors});
+      res.status(400).json(errors);
     } else {
       throw error;
     }
